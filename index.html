@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="styles.css">
+    
+    <title>ЕГТК</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Журнал выдачи дипломов</h1>
+
+        <form id="searchForm">
+            <label for="searchInput">Поиск:</label>
+            <input type="text" id="searchInput" placeholder="Введите критерии поиска">
+            <button type="button" onclick="search()">Искать</button>
+        </form>
+
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addModal">
+            Добавить учащегося
+        </button>
+
+        <table id="journalTable" class="table">
+            <thead>
+                <tr>
+                    <th>Пор. рег.номер</th>
+                    <th>Серия и № диплома</th>
+                    <th>Дата выдачи диплома</th>
+                    <th>ФИО</th>
+                    <th>Наим. специальности</th>
+                    <th>Квалификация</th>
+                    <th>Дата и № протокола</th>
+                    <th>Комментарий</th>
+                    <th>Действия</th> <!-- Новый столбец для кнопок действий -->
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Данные будут добавляться с помощью JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+<!-- Modal -->
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addModalLabel">Добавить учащегося</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addForm">
+                        <label for="regNumber">Порядко рег.номер:</label>
+                        <input type="text" id="regNumber" required>
+
+                        <label for="diplomaInfo">Серия и № диплома:</label>
+                        <input type="text" id="diplomaInfo" required>
+
+                        <label for="diplomaDate">Дата выдачи диплома:</label>
+                        <input type="text" id="diplomaDate" placeholder="ДД.ММ.ГГГГ" required>
+
+                        <label for="fullName">ФИО:</label>
+                        <input type="text" id="fullName" required>
+
+                        <label for="specialty">Наим. специальности:</label>
+                        <input type="text" id="specialty" required>
+
+                        <label for="qualification">Квалификация:</label>
+                        <input type="text" id="qualification" required>
+
+                        <label for="protocolInfo">Дата и № протокола:</label>
+                        <input type="text" id="protocolInfo" required>
+
+                        <label for="comment">Комментарий:</label>
+                        <input type="text" id="comment" required>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-primary" onclick="addStudent()">Добавить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+<div class="toast fixed-top" role="alert" aria-live="assertive" aria-atomic="true" data-delay="3000">
+    <div class="toast-header">
+        <strong class="mr-auto">Уведомление</strong>
+        <small>Только что</small>
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="toast-body">
+        Участник успешно добавлен!
+    </div>
+</div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="script.js"></script>
+    <!-- ... (весь предыдущий HTML код без изменений) ... -->
+<script>
+    // Ваш JavaScript код здесь
+
+    // ... (остальной код без изменений) ...
+
+    function deletePerson(index) {
+        // Сохраняем индекс удаляемой записи
+        editingIndex = index;
+
+        // Всплывающее окно подтверждения удаления
+        if (confirm("Вы уверены, что хотите удалить этого человека из журнала?")) {
+            // Если пользователь согласен, удаляем запись
+            peopleData.splice(editingIndex, 1);
+            saveToLocalStorage(peopleData);
+            displayData(peopleData);
+        } else {
+            // Если пользователь отменил удаление
+            editingIndex = null;
+        }
+    }
+ function addStudent() {
+        if (editingIndex !== null) {
+            saveEditedPerson();
+        } else {
+            const regNumber = document.getElementById('regNumber').value;
+            const diplomaInfo = document.getElementById('diplomaInfo').value;
+            const diplomaDate = document.getElementById('diplomaDate').value;
+            const fullName = document.getElementById('fullName').value;
+            const specialty = document.getElementById('specialty').value;
+            const qualification = document.getElementById('qualification').value;
+            const protocolInfo = document.getElementById('protocolInfo').value;
+            const comment = document.getElementById('comment').value;
+
+            const newStudent = {
+                regNumber,
+                diplomaInfo,
+                diplomaDate,
+                fullName,
+                specialty,
+                qualification,
+                protocolInfo,
+                comment
+            };
+
+            peopleData.push(newStudent);
+            // Вызов функции для показа всплывающего уведомления
+            showNotification();
+
+        }
+
+        saveToLocalStorage(peopleData);
+        displayData(peopleData);
+
+        document.getElementById('addForm').reset();
+        $('#addModal').modal('hide');
+        editingIndex = null;
+    }
+
+    // Добавлена функция для показа всплывающего уведомления
+    function showNotification() {
+        const toast = new bootstrap.Toast(document.querySelector('.toast'));
+        toast.show();
+    }
+
+    // Остальной код остается без изменений
+</script>
+
+<!-- ... (весь последующий HTML код без изменений) ... -->
+
+</body>
+</html>
